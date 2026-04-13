@@ -1,0 +1,576 @@
+// ===== src/pages/AuthPage.tsx =====
+
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { toast } from "sonner";
+import { Eye, EyeOff, Mail, Lock, User, Phone, ArrowLeft } from "lucide-react";
+import timberHero from "@/assets/timber-hero.jpg";
+import logo from "@/assets/logo.png";
+
+const AuthPage = () => {
+  const navigate = useNavigate();
+  const [showPassword, setShowPassword] = useState(false);
+  const [loginForm, setLoginForm] = useState({ email: "", password: "" });
+  const [registerForm, setRegisterForm] = useState({
+    fullName: "",
+    email: "",
+    phone: "",
+    password: "",
+    confirmPassword: "",
+  });
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!loginForm.email || !loginForm.password) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+    toast.success("Login successful! (UI only — no backend connected)");
+  };
+
+  const handleRegister = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!registerForm.fullName || !registerForm.email || !registerForm.password) {
+      toast.error("Please fill in all required fields");
+      return;
+    }
+    if (registerForm.password !== registerForm.confirmPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+    if (registerForm.password.length < 6) {
+      toast.error("Password must be at least 6 characters");
+      return;
+    }
+    toast.success("Account created! (UI only — no backend connected)");
+  };
+
+  return (
+    <div className="min-h-screen flex">
+      {/* Left — Image Panel */}
+      <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
+        <img
+          src={timberHero}
+          alt="Premium timber lumber"
+          className="absolute inset-0 w-full h-full object-cover"
+          width={1920}
+          height={1080}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-timber-900/80 via-timber-800/40 to-transparent" />
+        <div className="relative z-10 flex flex-col justify-end p-12 pb-16">
+          <h2 className="font-heading text-4xl font-bold text-primary-foreground mb-3">
+            Premium Timber,
+            <br />
+            Delivered to You.
+          </h2>
+          <p className="text-timber-200 text-lg max-w-md font-body">
+            Source the finest hardwoods and softwoods from trusted suppliers worldwide.
+          </p>
+        </div>
+      </div>
+
+      {/* Right — Auth Form */}
+      <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 bg-background">
+        <button
+          onClick={() => navigate("/")}
+          className="absolute top-6 left-6 lg:left-auto lg:right-6 flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors text-sm"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back
+        </button>
+
+        <div className="w-full max-w-md space-y-8">
+          {/* Logo */}
+          <div className="flex flex-col items-center gap-3">
+            <img src={logo} alt="TimberMerchant" className="w-16 h-16" width={512} height={512} />
+            <h1 className="font-heading text-2xl font-semibold text-foreground">TimberMerchant</h1>
+          </div>
+
+          <Tabs defaultValue="login" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 bg-muted">
+              <TabsTrigger value="login" className="font-body">Sign In</TabsTrigger>
+              <TabsTrigger value="register" className="font-body">Create Account</TabsTrigger>
+            </TabsList>
+
+            {/* Login */}
+            <TabsContent value="login" className="mt-6">
+              <form onSubmit={handleLogin} className="space-y-5">
+                <div className="space-y-2">
+                  <Label htmlFor="login-email" className="text-foreground font-body text-sm">Email</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input
+                      id="login-email"
+                      type="email"
+                      placeholder="you@example.com"
+                      className="pl-10 bg-card border-border font-body"
+                      value={loginForm.email}
+                      onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <Label htmlFor="login-password" className="text-foreground font-body text-sm">Password</Label>
+                    <button type="button" className="text-xs text-accent hover:underline font-body">
+                      Forgot password?
+                    </button>
+                  </div>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input
+                      id="login-password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="••••••••"
+                      className="pl-10 pr-10 bg-card border-border font-body"
+                      value={loginForm.password}
+                      onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <Button type="submit" className="w-full font-body font-medium">
+                  Sign In
+                </Button>
+              </form>
+            </TabsContent>
+
+            {/* Register */}
+            <TabsContent value="register" className="mt-6">
+              <form onSubmit={handleRegister} className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="reg-name" className="text-foreground font-body text-sm">Full Name</Label>
+                  <div className="relative">
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input
+                      id="reg-name"
+                      placeholder="John Doe"
+                      className="pl-10 bg-card border-border font-body"
+                      value={registerForm.fullName}
+                      onChange={(e) => setRegisterForm({ ...registerForm, fullName: e.target.value })}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="reg-email" className="text-foreground font-body text-sm">Email</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input
+                      id="reg-email"
+                      type="email"
+                      placeholder="you@example.com"
+                      className="pl-10 bg-card border-border font-body"
+                      value={registerForm.email}
+                      onChange={(e) => setRegisterForm({ ...registerForm, email: e.target.value })}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="reg-phone" className="text-foreground font-body text-sm">Phone (optional)</Label>
+                  <div className="relative">
+                    <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input
+                      id="reg-phone"
+                      type="tel"
+                      placeholder="+1 (555) 000-0000"
+                      className="pl-10 bg-card border-border font-body"
+                      value={registerForm.phone}
+                      onChange={(e) => setRegisterForm({ ...registerForm, phone: e.target.value })}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="reg-password" className="text-foreground font-body text-sm">Password</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input
+                      id="reg-password"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Min. 6 characters"
+                      className="pl-10 pr-10 bg-card border-border font-body"
+                      value={registerForm.password}
+                      onChange={(e) => setRegisterForm({ ...registerForm, password: e.target.value })}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    >
+                      {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="reg-confirm" className="text-foreground font-body text-sm">Confirm Password</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                    <Input
+                      id="reg-confirm"
+                      type={showPassword ? "text" : "password"}
+                      placeholder="Re-enter password"
+                      className="pl-10 bg-card border-border font-body"
+                      value={registerForm.confirmPassword}
+                      onChange={(e) => setRegisterForm({ ...registerForm, confirmPassword: e.target.value })}
+                    />
+                  </div>
+                </div>
+
+                <Button type="submit" className="w-full font-body font-medium">
+                  Create Account
+                </Button>
+
+                <p className="text-xs text-center text-muted-foreground font-body">
+                  By creating an account, you agree to our{" "}
+                  <span className="text-accent hover:underline cursor-pointer">Terms of Service</span>{" "}
+                  and{" "}
+                  <span className="text-accent hover:underline cursor-pointer">Privacy Policy</span>.
+                </p>
+              </form>
+            </TabsContent>
+          </Tabs>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AuthPage;
+
+
+// ===== src/pages/Index.tsx =====
+
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
+import { TreePine, ShieldCheck, Truck } from "lucide-react";
+import timberHero from "@/assets/timber-hero.jpg";
+import logo from "@/assets/logo.png";
+
+const Index = () => {
+  const navigate = useNavigate();
+
+  return (
+    <div className="min-h-screen bg-background">
+      {/* Nav */}
+      <nav className="flex items-center justify-between px-6 md:px-12 py-4 border-b border-border">
+        <div className="flex items-center gap-3">
+          <img src={logo} alt="TimberMerchant" className="w-10 h-10" width={512} height={512} />
+          <span className="font-heading text-xl font-semibold text-foreground">TimberMerchant</span>
+        </div>
+        <div className="flex items-center gap-3">
+          <Button variant="ghost" onClick={() => navigate("/auth")} className="font-body">
+            Sign In
+          </Button>
+          <Button onClick={() => navigate("/auth")} className="font-body">
+            Get Started
+          </Button>
+        </div>
+      </nav>
+
+      {/* Hero */}
+      <section className="relative h-[70vh] min-h-[480px] flex items-center overflow-hidden">
+        <img
+          src={timberHero}
+          alt="Premium timber"
+          className="absolute inset-0 w-full h-full object-cover"
+          width={1920}
+          height={1080}
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-timber-900/85 via-timber-800/60 to-transparent" />
+        <div className="relative z-10 px-6 md:px-16 max-w-2xl space-y-6">
+          <h1 className="font-heading text-4xl md:text-5xl lg:text-6xl font-bold text-primary-foreground leading-tight">
+            Quality Wood for Every Project
+          </h1>
+          <p className="text-timber-200 text-lg md:text-xl font-body leading-relaxed">
+            From raw lumber to finished boards — source premium timber from trusted suppliers at competitive prices.
+          </p>
+          <Button size="lg" onClick={() => navigate("/auth")} className="font-body text-base px-8">
+            Shop Now
+          </Button>
+        </div>
+      </section>
+
+      {/* Features */}
+      <section className="py-20 px-6 md:px-12">
+        <div className="max-w-5xl mx-auto grid md:grid-cols-3 gap-10">
+          {[
+            { icon: TreePine, title: "Sustainably Sourced", desc: "All our timber comes from certified sustainable forests." },
+            { icon: ShieldCheck, title: "Quality Guaranteed", desc: "Every plank is inspected and graded before shipping." },
+            { icon: Truck, title: "Fast Delivery", desc: "Nationwide delivery within 3-5 business days." },
+          ].map(({ icon: Icon, title, desc }) => (
+            <div key={title} className="text-center space-y-3">
+              <div className="mx-auto w-14 h-14 rounded-full bg-secondary flex items-center justify-center">
+                <Icon className="w-7 h-7 text-primary" />
+              </div>
+              <h3 className="font-heading text-xl font-semibold text-foreground">{title}</h3>
+              <p className="text-muted-foreground font-body text-sm">{desc}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+};
+
+export default Index;
+
+
+// ===== src/index.css =====
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+
+@layer base {
+  :root {
+    --background: 30 25% 97%;
+    --foreground: 25 30% 12%;
+
+    --card: 30 20% 95%;
+    --card-foreground: 25 30% 12%;
+
+    --popover: 30 20% 95%;
+    --popover-foreground: 25 30% 12%;
+
+    --primary: 25 55% 28%;
+    --primary-foreground: 35 30% 96%;
+
+    --secondary: 35 30% 90%;
+    --secondary-foreground: 25 30% 18%;
+
+    --muted: 30 15% 92%;
+    --muted-foreground: 25 10% 45%;
+
+    --accent: 35 60% 50%;
+    --accent-foreground: 30 25% 97%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 30 20% 85%;
+    --input: 30 20% 85%;
+    --ring: 25 55% 28%;
+
+    --radius: 0.5rem;
+
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+
+    --font-heading: 'Playfair Display', serif;
+    --font-body: 'Inter', sans-serif;
+  }
+
+  .dark {
+    --background: 25 20% 8%;
+    --foreground: 35 20% 92%;
+    --card: 25 18% 12%;
+    --card-foreground: 35 20% 92%;
+    --popover: 25 18% 12%;
+    --popover-foreground: 35 20% 92%;
+    --primary: 35 60% 50%;
+    --primary-foreground: 25 30% 8%;
+    --secondary: 25 15% 18%;
+    --secondary-foreground: 35 20% 92%;
+    --muted: 25 12% 18%;
+    --muted-foreground: 30 10% 55%;
+    --accent: 35 55% 45%;
+    --accent-foreground: 25 20% 8%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 25 15% 22%;
+    --input: 25 15% 22%;
+    --ring: 35 60% 50%;
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-body);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+  }
+}
+
+
+// ===== src/App.tsx =====
+
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { Toaster as Sonner } from "@/components/ui/sonner";
+import { Toaster } from "@/components/ui/toaster";
+import { TooltipProvider } from "@/components/ui/tooltip";
+import Index from "./pages/Index.tsx";
+import AuthPage from "./pages/AuthPage.tsx";
+import NotFound from "./pages/NotFound.tsx";
+
+const queryClient = new QueryClient();
+
+const App = () => (
+  <QueryClientProvider client={queryClient}>
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/auth" element={<AuthPage />} />
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
+    </TooltipProvider>
+  </QueryClientProvider>
+);
+
+export default App;
+
+
+// ===== tailwind.config.ts =====
+
+import type { Config } from "tailwindcss";
+
+export default {
+  darkMode: ["class"],
+  content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
+  prefix: "",
+  theme: {
+    container: {
+      center: true,
+      padding: "2rem",
+      screens: {
+        "2xl": "1400px",
+      },
+    },
+    extend: {
+      fontFamily: {
+        heading: ['Playfair Display', 'serif'],
+        body: ['Inter', 'sans-serif'],
+      },
+      colors: {
+        border: "hsl(var(--border))",
+        input: "hsl(var(--input))",
+        ring: "hsl(var(--ring))",
+        background: "hsl(var(--background))",
+        foreground: "hsl(var(--foreground))",
+        primary: {
+          DEFAULT: "hsl(var(--primary))",
+          foreground: "hsl(var(--primary-foreground))",
+        },
+        secondary: {
+          DEFAULT: "hsl(var(--secondary))",
+          foreground: "hsl(var(--secondary-foreground))",
+        },
+        destructive: {
+          DEFAULT: "hsl(var(--destructive))",
+          foreground: "hsl(var(--destructive-foreground))",
+        },
+        muted: {
+          DEFAULT: "hsl(var(--muted))",
+          foreground: "hsl(var(--muted-foreground))",
+        },
+        accent: {
+          DEFAULT: "hsl(var(--accent))",
+          foreground: "hsl(var(--accent-foreground))",
+        },
+        popover: {
+          DEFAULT: "hsl(var(--popover))",
+          foreground: "hsl(var(--popover-foreground))",
+        },
+        card: {
+          DEFAULT: "hsl(var(--card))",
+          foreground: "hsl(var(--card-foreground))",
+        },
+        sidebar: {
+          DEFAULT: "hsl(var(--sidebar-background))",
+          foreground: "hsl(var(--sidebar-foreground))",
+          primary: "hsl(var(--sidebar-primary))",
+          "primary-foreground": "hsl(var(--sidebar-primary-foreground))",
+          accent: "hsl(var(--sidebar-accent))",
+          "accent-foreground": "hsl(var(--sidebar-accent-foreground))",
+          border: "hsl(var(--sidebar-border))",
+          ring: "hsl(var(--sidebar-ring))",
+        },
+        timber: {
+          50: "hsl(35, 30%, 96%)",
+          100: "hsl(35, 28%, 90%)",
+          200: "hsl(30, 25%, 80%)",
+          300: "hsl(28, 30%, 65%)",
+          400: "hsl(25, 40%, 50%)",
+          500: "hsl(25, 55%, 38%)",
+          600: "hsl(25, 55%, 28%)",
+          700: "hsl(22, 50%, 22%)",
+          800: "hsl(20, 45%, 16%)",
+          900: "hsl(18, 40%, 10%)",
+        },
+      },
+      borderRadius: {
+        lg: "var(--radius)",
+        md: "calc(var(--radius) - 2px)",
+        sm: "calc(var(--radius) - 4px)",
+      },
+      keyframes: {
+        "accordion-down": {
+          from: {
+            height: "0",
+          },
+          to: {
+            height: "var(--radix-accordion-content-height)",
+          },
+        },
+        "accordion-up": {
+          from: {
+            height: "var(--radix-accordion-content-height)",
+          },
+          to: {
+            height: "0",
+          },
+        },
+      },
+      animation: {
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
+      },
+    },
+  },
+  plugins: [require("tailwindcss-animate")],
+} satisfies Config;
+
+
